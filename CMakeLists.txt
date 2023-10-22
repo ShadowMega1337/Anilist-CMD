@@ -14,8 +14,10 @@ set(SOURCES
         include/Title.h
         src/MediaBuild.cpp
         include/MediaBuild.h
-        src/Draw.cpp
-        include/Draw.h
+        src/UI.cpp
+        include/UI.h
+        src/Backend.cpp
+        src/Backend.h
 )
 
 include_directories(

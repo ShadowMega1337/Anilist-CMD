@@ -2,8 +2,8 @@
 // Created by user on 10/20/2023.
 //
 
-#ifndef M323_LB3_DRAW_H
-#define M323_LB3_DRAW_H
+#ifndef M323_LB3_UI_H
+#define M323_LB3_UI_H
 
 #include <vector>
 #include <iostream>
@@ -11,11 +11,12 @@
 
 #include "Media.h"
 
-class Draw
+class UI
 {
 public:
 
-    std::string drawList(std::vector<Media *> mediaList, int show);
+    static void drawList(std::vector<Media *> mediaList, int show);
+    static void drawMenu();
 
 private:
     static std::string formatToString(MediaFormat format);
@@ -30,4 +31,4 @@ private:
 
 };
 
-#endif //M323_LB3_DRAW_H
+#endif //M323_LB3_UI_H

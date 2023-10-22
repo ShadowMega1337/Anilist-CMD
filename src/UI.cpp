@@ -2,32 +2,41 @@
 // Created by user on 10/20/2023.
 //
 
-#include "Draw.h"
+#include "UI.h"
 
-std::string Draw::drawList(std::vector<Media *> mediaList, int show)
+void UI::drawList(std::vector<Media *> mediaList, int page)
 {
-    if (show == 0) {
+    if (page == -1)
+    {
+        return;
+    }
+    else if (page == 0)
+    {
         std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
         printf("|%-166s|%-10s|%-10s|%-10s|\n", "Title", "Score", "Episodes", "Status");
-
     }
-    for (int i = show; i < show + 20; ++i) {
+    for (int i = page * 50; i < page * 50 + 50 && i < mediaList.size(); ++i)
+    {
         auto media = mediaList[i];
         std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
         printf("|%-166s|%10d|%10d|%10s|\n", media->getTitle().getEnglish().c_str(), media->getAverageScore(),
                media->getEpisodes(), mediaStatusToString(media->getStatus()).c_str());
     }
     std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
-
-    std::string input;
-    std::cin >> input;
-    return input;
+    std::cout << "Page " << page + 1 << " out of " << mediaList.size() / 50 + 1 << std::endl;
 }
 
-
-std::string Draw::mediaSeasonToString(MediaSeason season)
+void UI::drawMenu()
 {
-    switch (season) {
+    std::cout << "Press 1, to see your list" << "\n"
+              << "Press 2, to see your stats" << "\n\n"
+              << "Press 0, to exit" << std::endl;
+}
+
+std::string UI::mediaSeasonToString(MediaSeason season)
+{
+    switch (season)
+    {
         case MediaSeason::SPRING:
             return "SPRING";
         case MediaSeason::SUMMER:
@@ -41,9 +50,10 @@ std::string Draw::mediaSeasonToString(MediaSeason season)
     }
 }
 
-std::string Draw::mediaTypeToString(MediaType type)
+std::string UI::mediaTypeToString(MediaType type)
 {
-    switch (type) {
+    switch (type)
+    {
         case MediaType::ANIME:
             return "ANIME";
         case MediaType::MANGA:
@@ -53,9 +63,10 @@ std::string Draw::mediaTypeToString(MediaType type)
     }
 }
 
-std::string Draw::formatToString(MediaFormat format)
+std::string UI::formatToString(MediaFormat format)
 {
-    switch (format) {
+    switch (format)
+    {
         case MediaFormat::TV:
             return "TV";
         case MediaFormat::TV_SHORT:
@@ -79,9 +90,10 @@ std::string Draw::formatToString(MediaFormat format)
     }
 }
 
-std::string Draw::mediaSourceToString(MediaSource source)
+std::string UI::mediaSourceToString(MediaSource source)
 {
-    switch (source) {
+    switch (source)
+    {
         case MediaSource::ORIGINAL:
             return "ORIGINAL";
         case MediaSource::MANGA:
@@ -116,9 +128,10 @@ std::string Draw::mediaSourceToString(MediaSource source)
 }
 
 
-std::string Draw::mediaStatusToString(MediaStatus status)
+std::string UI::mediaStatusToString(MediaStatus status)
 {
-    switch (status) {
+    switch (status)
+    {
         case MediaStatus::FINISHED:
             return "FINISHED";
         case MediaStatus::RELEASING:
@@ -131,3 +144,4 @@ std::string Draw::mediaStatusToString(MediaStatus status)
             return "HIATUS";
     }
 }
+
