@@ -15,7 +15,7 @@ class Draw
 {
 public:
 
-    void drawList(std::vector<Media *> media);
+    std::string drawList(std::vector<Media *> mediaList, int show);
 
 private:
     static std::string formatToString(MediaFormat format);

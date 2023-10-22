@@ -4,34 +4,24 @@
 
 #include "Draw.h"
 
-void Draw::drawList(std::vector<Media *> mediaList)
+std::string Draw::drawList(std::vector<Media *> mediaList, int show)
 {
-    std::cout << mediaList.size() << std::endl;
-    if (!mediaList.empty() && mediaList[0] != nullptr) {
-        // Check if the vector is not empty and the pointer is valid
-        Media *firstMedia = mediaList[0];
-        std::cout << firstMedia->getEpisodes() << std::endl;
-    } else {
-        std::cout << "The vector is empty or the first element is nullptr." << std::endl;
-    }
-    for (auto media : mediaList) {
-        std::cout << "Title: " << media->getTitle().getEnglish() << std::endl;
-        std::cout << "Score: " << media->getAverageScore() << std::endl;
-        std::cout << "Eps.: " << media->getEpisodes() << std::endl;
-        std::cout << "Startdate: " << media->getStartDate().getMonth() << std::endl;
-        std::cout << "Id: " << media->getId() << std::endl;
-        std::cout << "CountryCode: " << media->getCountryCode() << std::endl;
-        std::cout << "Duration: " << media->getDuration() << std::endl;
-        std::cout << "Enddate: " << media->getEndDate().getMonth() << std::endl;
-        std::cout << "Format: " << formatToString(media->getFormat()) << std::endl;
-        std::cout << "Popularity: " << media->getPopularity() << std::endl;
-        std::cout << "Season: " << mediaSeasonToString(media->getSeason()) << std::endl;
-        std::cout << "SeasonYear: " << media->getSeasonYear() << std::endl;
-        std::cout << "Source: " << mediaSourceToString(media->getSource()) << std::endl;
-        std::cout << "Status: " << mediaStatusToString(media->getStatus()) << std::endl;
-        std::cout << "Type: " << mediaTypeToString(media->getType()) << std::endl;
-    }
+    if (show == 0) {
+        std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
+        printf("|%-166s|%-10s|%-10s|%-10s|\n", "Title", "Score", "Episodes", "Status");
 
+    }
+    for (int i = show; i < show + 20; ++i) {
+        auto media = mediaList[i];
+        std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
+        printf("|%-166s|%10d|%10d|%10s|\n", media->getTitle().getEnglish().c_str(), media->getAverageScore(),
+               media->getEpisodes(), mediaStatusToString(media->getStatus()).c_str());
+    }
+    std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
+
+    std::string input;
+    std::cin >> input;
+    return input;
 }
 
 

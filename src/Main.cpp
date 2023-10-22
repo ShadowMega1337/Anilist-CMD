@@ -2,14 +2,12 @@
 
 #include "MediaBuild.h"
 #include "Draw.h"
-#include <iomanip>
 
 int main()
 {
     std::vector<Media*> media = (new MediaBuild)->readMediaJSON();
-    std::cout << "Eps:" << media[0]->getEpisodes() << std::endl;
     Draw* draw = new Draw();
-    draw->drawList(media);
+    draw->drawList(media, 0);
 
 
     return 0;
