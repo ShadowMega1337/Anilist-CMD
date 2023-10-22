@@ -17,7 +17,9 @@ set(SOURCES
         src/UI.cpp
         include/UI.h
         src/Backend.cpp
-        src/Backend.h
+        include/Backend.h
+        src/UIService.cpp
+        include/UIService.h
 )
 
 include_directories(
@@ -27,7 +29,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-find_package(PkgConfig REQUIRED)
+FIND_PACKAGE(PkgConfig REQUIRED)
 
 pkg_check_modules(JSONCPP jsoncpp)
 

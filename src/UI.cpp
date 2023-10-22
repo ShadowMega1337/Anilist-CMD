@@ -13,17 +13,23 @@ void UI::drawList(std::vector<Media *> mediaList, int page)
     else if (page == 0)
     {
         std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
-        printf("|%-166s|%-10s|%-10s|%-10s|\n", "Title", "Score", "Episodes", "Status");
+        printf("|%-6s|%-149s|%-10s|%-10s|%-20s|\n", "Id", "Title", "Score", "Episodes", "Status");
     }
     for (int i = page * 50; i < page * 50 + 50 && i < mediaList.size(); ++i)
     {
         auto media = mediaList[i];
         std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
-        printf("|%-166s|%10d|%10d|%10s|\n", media->getTitle().getEnglish().c_str(), media->getAverageScore(),
+        printf("|%-6d|%-149s|%10d|%10d|%20s|\n", media->getId(), media->getTitle().getEnglish().c_str(), media->getAverageScore(),
                media->getEpisodes(), mediaStatusToString(media->getStatus()).c_str());
     }
     std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
     std::cout << "Page " << page + 1 << " out of " << mediaList.size() / 50 + 1 << std::endl;
+
+    std::cout << "\nPress F, to search" << "\n"
+              << "Press N, to see the next 50 entries" << "\n"
+              << "Press S, to select a Anime" << "\n"
+              << "Press P, to go to a specific page" << "\n\n"
+              << "Press 0, to go back" << std::endl;
 }
 
 void UI::drawMenu()
@@ -31,6 +37,16 @@ void UI::drawMenu()
     std::cout << "Press 1, to see your list" << "\n"
               << "Press 2, to see your stats" << "\n\n"
               << "Press 0, to exit" << std::endl;
+}
+
+void UI::drawStats(const std::vector<Media *>& mediaList)
+{
+    std::cout << "Stats" << "\n"
+              << "Total Anime: " << mediaList.size() << "\n"
+              << "Average Score: " << Backend::getAverageScore(mediaList) << "\n"
+              << "Total Episodes: " << Backend::getTotalEpisodes(mediaList) << std::endl;
+
+    std::cout << "\nPress any button to go back" << std::endl;
 }
 
 std::string UI::mediaSeasonToString(MediaSeason season)

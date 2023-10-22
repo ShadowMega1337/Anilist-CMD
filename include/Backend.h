@@ -14,7 +14,15 @@
 class Backend
 {
 public:
-    static std::vector<Media*> getFilteredList(std::vector<Media*> media, std::string filter);
+    static std::vector<Media*> getFilteredList(std::vector<Media*> media, const std::string& filter);
+
+    static short getAverageScore(const std::vector<Media *>& media);
+
+    static unsigned int getTotalEpisodes(const std::vector<Media *>& media);
+
+    static Media* getAnimeWithId(int id);
+
+    static Media* getAnimeWithName(const std::string& name);
 };
 
 

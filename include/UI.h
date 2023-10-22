@@ -10,6 +10,7 @@
 #include <iomanip>
 
 #include "Media.h"
+#include "Backend.h"
 
 class UI
 {
@@ -17,6 +18,7 @@ public:
 
     static void drawList(std::vector<Media *> mediaList, int show);
     static void drawMenu();
+    static void drawStats(const std::vector<Media *>& mediaList);
 
 private:
     static std::string formatToString(MediaFormat format);

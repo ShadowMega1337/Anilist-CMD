@@ -44,7 +44,6 @@ std::vector<Media *> MediaBuild::readMediaJSON()
                 mediaJson["countryOfOrigin"].asString()
         );
         mediaArray.push_back(media);
-
     }
     jsonFile.close();
     return mediaArray;
