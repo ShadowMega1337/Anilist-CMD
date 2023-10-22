@@ -20,9 +20,9 @@ public:
 
     static unsigned int getTotalEpisodes(const std::vector<Media *>& media);
 
-    static Media* getAnimeWithId(int id);
+    static Media* getAnimeWithId(const std::vector<Media *>& media, int id);
 
-    static Media* getAnimeWithName(const std::string& name);
+    static Media* getAnimeWithName(const std::vector<Media *>& media, const std::string& name);
 };
 
 

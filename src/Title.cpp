@@ -9,7 +9,7 @@ Title::Title()
 
 }
 
-Title::Title(const std::string &romaji, const std::string &english) : romaji(romaji), english(english)
+Title::Title(const std::string &english, const std::string &romaji) : romaji(romaji), english(english)
 {
 }
 

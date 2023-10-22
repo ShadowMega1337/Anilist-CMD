@@ -20,6 +20,8 @@ set(SOURCES
         include/Backend.h
         src/UIService.cpp
         include/UIService.h
+        src/EnumMapping.cpp
+        include/EnumMapping.h
 )
 
 include_directories(

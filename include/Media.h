@@ -6,6 +6,8 @@
 #define M323_LB3_MEDIA_H
 
 #include <string>
+#include <iostream>
+#include <vector>
 
 #include "MediaSeason.h"
 #include "MediaType.h"
@@ -15,49 +17,52 @@
 #include "MediaSort.h"
 #include "Date.h"
 #include "Title.h"
+#include "EnumMapping.h"
 
 class Media
 {
 private:
     int id;
-    Title title;
-    Date startDate;
-    Date endDate;
+    Title* title;
+    Date* startDate;
+    Date* endDate;
     MediaSeason season;
     int seasonYear;
     MediaType type;
     MediaFormat format;
     MediaStatus status;
     int episodes;
+    int watchedEpisodes;
     int duration;
     bool adult;
-    long averageScore;
+    std::vector<std::string> genres;
+    int averageScore;
     int popularity;
     MediaSource source;
-    std::string countryCode;
+    std::string countryOfOrigin;
 public:
     Media();
 
-    Media(int id, const Title &title, const Date &startDate, const Date &endDate, MediaSeason season, int seasonYear,
-          MediaType type, MediaFormat format, MediaStatus status, int episodes, int duration,
-          bool adult, int averageScore, int popularity, MediaSource source,
-          const std::string &countryCode);
+    Media(int id, Title *title, Date *startDate, Date *endDate, MediaSeason season, int seasonYear, MediaType type,
+          MediaFormat format, MediaStatus status, int episodes, int duration, bool isAdult,
+          const std::vector<std::string> &genres, int averageScore, int popularity, MediaSource source,
+          const std::string &countryOfOrigin);
 
     int getId() const;
 
     void setId(int id);
 
-    const Title &getTitle() const;
+    Title *getTitle() const;
 
-    void setTitle(const Title &title);
+    void setTitle(Title *title);
 
-    const Date &getStartDate() const;
+    Date *getStartDate() const;
 
-    void setStartDate(const Date &startDate);
+    void setStartDate(Date *startDate);
 
-    const Date &getEndDate() const;
+    Date *getEndDate() const;
 
-    void setEndDate(const Date &endDate);
+    void setEndDate(Date *endDate);
 
     MediaSeason getSeason() const;
 
@@ -83,13 +88,22 @@ public:
 
     void setEpisodes(int episodes);
 
+    int getWatchedEpisodes() const;
+
+    void setWatchedEpisodes(int watchedEpisodes);
+
+
     int getDuration() const;
 
     void setDuration(int duration);
 
     bool isAdult() const;
 
-    void setAdult(bool adult);
+    void setAdult(bool isAdult);
+
+    const std::vector<std::string> &getGenres() const;
+
+    void setGenres(const std::vector<std::string> &genres);
 
     int getAverageScore() const;
 
@@ -103,9 +117,11 @@ public:
 
     void setSource(MediaSource source);
 
-    const std::string &getCountryCode() const;
+    const std::string &getCountryOfOrigin() const;
 
-    void setCountryCode(const std::string &countryCode);
+    void setCountryOfOrigin(const std::string &countryOfOrigin);
+
+    void printAttributes();
 };
 
 #endif //M323_LB3_MEDIA_H

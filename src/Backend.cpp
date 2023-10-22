@@ -19,12 +19,12 @@ unsigned int Backend::getTotalEpisodes(const std::vector<Media *>& media)
     return 0;
 }
 
-Media* Backend::getAnimeWithId(int id)
+Media* Backend::getAnimeWithId(const std::vector<Media *>& media, int id)
 {
-    return new Media;
+    return media[0];
 }
 
-Media* Backend::getAnimeWithName(const std::string& name)
+Media* Backend::getAnimeWithName(const std::vector<Media *>& media, const std::string& name)
 {
-    return new Media; // Can be NULL (nullptr)
+    return media[0]; // Can be NULL (nullptr)
 }

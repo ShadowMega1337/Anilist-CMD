@@ -11,17 +11,20 @@
 
 #include "UI.h"
 #include "Backend.h"
+#include "MediaBuild.h"
 
 class UIService
 {
 public:
     static short menu();
 
-    static void list(const std::vector<Media *> &media, UI *draw);
+    static void list(const std::vector<Media *> &media, bool isBrowse);
 
     static void stats(const std::vector<Media *>& media);
 
-    static void editMedia(Media *media);
+    static void editMedia(Media *media, bool isBrowse);
+
+    static std::string getTitle(Title* title);
 };
 
 
