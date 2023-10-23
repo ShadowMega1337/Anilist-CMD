@@ -1,9 +1,18 @@
 cmake_minimum_required(VERSION 3.22)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(PROJECT_NAME M323_LB3)
 
 project(${PROJECT_NAME})
+
+
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+add_subdirectory(lib/jsoncpp/)
+
 
 set(SOURCES
         src/Main.cpp
@@ -24,18 +33,7 @@ set(SOURCES
         include/EnumMapping.h
 )
 
-include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-FIND_PACKAGE(PkgConfig REQUIRED)
-
-pkg_check_modules(JSONCPP jsoncpp)
-
-link_libraries(${JSONCPP_LIBRARIES})
-
-target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES})
-
+target_link_libraries(${PROJECT_NAME} PRIVATE jsoncpp_lib)
