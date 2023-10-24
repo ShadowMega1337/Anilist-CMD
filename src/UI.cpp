@@ -41,7 +41,7 @@ void UI::drawList(std::vector<Media *> mediaList, int page, bool isBrowse)
             printf("|%-6d|%-149s|%10d|%10d|%20s|\n",
                    media->getId(), UIService::getTitle(media->getTitle()).c_str(),
                    media->getAverageScore(),
-                   media->getEpisodes(),
+                   media->getWatchedEpisodes(),
                    getWatchedStatus(media->getEpisodes(), media->getWatchedEpisodes()).c_str());
         }
     }
@@ -62,7 +62,7 @@ void UI::drawList(std::vector<Media *> mediaList, int page, bool isBrowse)
 
 void UI::drawMenu()
 {
-    std::cout << "Press 1, to see browse" << "\n"
+    std::cout << "Press 1, to browse" << "\n"
               << "Press 2, to see your list" << "\n\n"
               << "Press 0, to exit" << std::endl;
 }
@@ -74,7 +74,8 @@ void UI::drawStats(const std::vector<Media *> &mediaList)
               << "Average Score: " << Backend::getAverageScore(mediaList) << "\n"
               << "Total Episodes: " << Backend::getTotalEpisodes(mediaList) << std::endl;
 
-    std::cout << "\nPress any button to go back" << std::endl;
+    std::cout << "\nPress R, to reset your ratings" << "\n"
+              << "Press any other button to go back" << std::endl;
 }
 
 std::string UI::getWatchedStatus(int episodes, int watchedEpisodes)

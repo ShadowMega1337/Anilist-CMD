@@ -15,7 +15,7 @@ std::string trim(const std::string &str)
     return str.substr(first, (last - first + 1));
 }
 
-std::vector<Media *> Backend::getFilteredList(std::vector<Media *> media, const std::string& filter)
+std::vector<Media *> Backend::getFilteredList(std::vector<Media *> media, const std::string &filter)
 {
     std::vector<Media *> filteredList;
         for (Media* mediaItem : media) {
@@ -40,7 +40,7 @@ std::vector<Media *> Backend::getFilteredList(std::vector<Media *> media, const 
 
 }
 
-short Backend::getAverageScore(const std::vector<Media *>& media)
+short Backend::getAverageScore(const std::vector<Media *> &media)
 {
     double totalScore = 0.0;
     int max = 0;
@@ -71,7 +71,7 @@ short Backend::getAverageScore(const std::vector<Media *>& media)
     }
 }
 
-unsigned int Backend::getTotalEpisodes(const std::vector<Media *>& media)
+unsigned int Backend::getTotalEpisodes(const std::vector<Media *> &media)
 {
     unsigned int totalEpisodes = 0;
 
@@ -86,7 +86,7 @@ unsigned int Backend::getTotalEpisodes(const std::vector<Media *>& media)
     return totalEpisodes;
 }
 
-Media* Backend::getAnimeWithId(const std::vector<Media *>& media, int id)
+Media *Backend::getAnimeWithId(const std::vector<Media *> &media, int id)
 {
     for (Media *mediaItem: media)
     {
@@ -98,7 +98,40 @@ Media* Backend::getAnimeWithId(const std::vector<Media *>& media, int id)
     return nullptr;
 }
 
-Media* Backend::getAnimeWithName(const std::vector<Media *>& media, const std::string& name)
+Media *Backend::getAnimeWithName(const std::vector<Media *> &media, const std::string &name)
 {
-    return media[0]; // Can be NULL (nullptr)
+    for (Media *mediaItem: media)
+    {
+        std::string titleEn = mediaItem->getTitle()->getEnglish();
+        std::string titleJp = mediaItem->getTitle()->getRomaji();
+        for (char &c: titleEn)
+        {
+            c = std::tolower(c);
+        }
+        for (char &c: titleJp)
+        {
+            c = std::tolower(c);
+        }
+
+        if (mediaItem->getTitle())
+        {
+            if ((titleEn == trim(name) && !titleEn.empty()) || (titleJp == trim(name) && !titleJp.empty()))
+            {
+                return mediaItem;
+            }
+
+        }
+
+    }
+    return nullptr;
+}
+
+void Backend::resetScore(const std::vector<Media *> &media)
+{
+    for (const auto &medium: media)
+    {
+        if (medium != nullptr) {
+            medium->setAverageScore(0);
+        }
+    }
 }

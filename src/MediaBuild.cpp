@@ -81,9 +81,8 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
         }
 
         Json::Value startDateJson;
-       if (media->getStartDate())
+        if (media->getStartDate())
         {
-
             const auto &startDate = media->getStartDate();
             startDateJson["year"] = startDate->getYear();
             startDateJson["month"] = startDate->getMonth();
@@ -121,7 +120,7 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
         }
 
         myList["genres"] = genres;
-        myList["averageScore"] = 0;
+        myList["averageScore"] = media->getAverageScore();
         myList["popularity"] = media->getPopularity();
         myList["source"] = EnumMapping::mediaSourceToString(media->getSource());
         myList["countryOfOrigin"] = media->getCountryOfOrigin();
@@ -134,7 +133,7 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
     {
         outFile << jsonArray;
         outFile.close();
-        std::cout << "Added tp list" << std::endl;
+        std::cout << "Added to list" << std::endl;
     }
     else
     {

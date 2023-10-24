@@ -8,6 +8,10 @@ int main()
     std::vector<Media *> media = MediaBuild::readMediaJSON(true);
     std::vector<Media *> myListMedia = MediaBuild::readMediaJSON(false);
 
+    UIService* service = new UIService;
+    service->setBrowseMedia(media);
+    service->setMyListMedia(myListMedia);
+
     std::string input;
     short window = 0; // 0: Menu, 1: List, 2: Stats
 
@@ -15,17 +19,19 @@ int main()
     {
         if (window == 1)
         {
-            UIService::list(media, true);
+            service->list(true);
         }
         else if (window == 2)
         {
-            UIService::list(myListMedia, false);
+            service->list(false);
         }
-        window = UIService::menu();
+        window = service->menu();
     }
     while (window != 0);
 
-    MediaBuild::writeListToFile(myListMedia);
+    MediaBuild::writeListToFile(service->getMyListMedia());
+
+    delete service;
 
     return 0;
 }

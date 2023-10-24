@@ -13,7 +13,7 @@ short UIService::menu()
     do
     {
         UI::drawMenu();
-        std::cin >> input;
+        std::getline(std::cin, input);
         std::istringstream stream(input);
         if (stream >> number && (number < 3 && number >= 0))
         {
@@ -28,8 +28,9 @@ short UIService::menu()
     while (true);
 }
 
-void UIService::list(const std::vector<Media *> &media, bool isBrowse)
+void UIService::list(bool isBrowse)
 {
+    std::vector<Media *> &media = isBrowse ? browseMedia : myListMedia;
     std::vector<Media *> filteredMedia = media;
     int page = 0;
     std::string input;
@@ -37,7 +38,7 @@ void UIService::list(const std::vector<Media *> &media, bool isBrowse)
     {
         UI::drawList(filteredMedia, page, isBrowse);
 
-        std::cin >> input;
+        std::getline(std::cin, input);
 
         for (char &c: input)
         {
@@ -52,32 +53,54 @@ void UIService::list(const std::vector<Media *> &media, bool isBrowse)
         {
             std::cout << "Input search string" << std::endl;
             std::string filter;
-            std::cin >> filter;
+            std::getline(std::cin, filter);
+
+            for (char &c: filter)
+            {
+                c = std::tolower(c);
+            }
+
             filteredMedia = Backend::getFilteredList(media, filter);
         }
         else if (input == "s")
         {
             std::cout << "Input id or the EXACT name to select an anime" << std::endl;
             std::string selectInput;
-            std::cin >> selectInput;
-
-            Media *selectedMedia;
-
-            std::istringstream stream(selectInput);
-
-            int id;
-            if (stream >> id)
+            do
             {
-                selectedMedia = Backend::getAnimeWithId(media, id);
-            }
-            else
-            {
-                selectedMedia = Backend::getAnimeWithName(media, selectInput);
-            }
+                std::getline(std::cin, selectInput);
 
-            selectedMedia->printAttributes();
+                for (char &c: selectInput)
+                {
+                    c = std::tolower(c);
+                }
 
-            editMedia(selectedMedia, isBrowse);
+                Media *selectedMedia;
+
+                std::istringstream stream(selectInput);
+
+                int id;
+                if (stream >> id)
+                {
+                    selectedMedia = Backend::getAnimeWithId(media, id);
+                }
+                else
+                {
+                    selectedMedia = Backend::getAnimeWithName(media, selectInput);
+                }
+                if (selectedMedia)
+                {
+                    selectedMedia->printAttributes();
+
+                    editMedia(*selectedMedia, isBrowse);
+                    break;
+                }
+                else
+                {
+                    std::cout << "Not found" << std::endl;
+                }
+            }
+            while (true);
         }
         else if (input == "p")
         {
@@ -87,7 +110,7 @@ void UIService::list(const std::vector<Media *> &media, bool isBrowse)
             do
             {
                 std::string pageInput;
-                std::cin >> pageInput;
+                std::getline(std::cin, pageInput);
                 std::istringstream stream(pageInput);
 
                 int checkPageInput;
@@ -109,10 +132,7 @@ void UIService::list(const std::vector<Media *> &media, bool isBrowse)
         }
         else
         {
-            std::istringstream stream(input);
-
-            short checkIfNum;
-            if (stream >> checkIfNum)
+            if (input == "1")
             {
                 UIService::stats(media);
             }
@@ -130,10 +150,19 @@ void UIService::stats(const std::vector<Media *> &media)
     UI::drawStats(media);
 
     std::string input;
-    std::cin >> input;
+    std::getline(std::cin, input);
+
+    for (char &c: input)
+    {
+        c = std::tolower(c);
+    }
+    if (input == "r")
+    {
+        Backend::resetScore(media);
+    }
 }
 
-void UIService::editMedia(Media *media, bool isBrowse)
+void UIService::editMedia(Media &media, bool isBrowse)
 {
     std::string input;
     do
@@ -150,14 +179,14 @@ void UIService::editMedia(Media *media, bool isBrowse)
         }
         std::cout << "Press 0, to go back" << std::endl;
 
-        std::cin >> input;
+        std::getline(std::cin, input);
 
         for (char &c: input)
         {
             c = std::tolower(c);
         }
 
-        if (input == "R" && !isBrowse)
+        if (input == "r" && !isBrowse)
         {
             do
             {
@@ -165,13 +194,15 @@ void UIService::editMedia(Media *media, bool isBrowse)
 
                 std::string ratingInput;
 
-                std::cin >> ratingInput;
+                std::getline(std::cin, ratingInput);
+
 
                 std::istringstream stream(ratingInput);
 
                 int rating;
                 if (stream >> rating)
                 {
+                    std::cout << rating;
                     if (rating > 100)
                     {
                         rating = 100;
@@ -180,7 +211,7 @@ void UIService::editMedia(Media *media, bool isBrowse)
                     {
                         rating = 0;
                     }
-                    media->setAverageScore(rating);
+                    media.setAverageScore(rating);
                     break;
                 }
                 else
@@ -190,7 +221,7 @@ void UIService::editMedia(Media *media, bool isBrowse)
             }
             while (true);
         }
-        else if (input == "P" && !isBrowse)
+        else if (input == "p" && !isBrowse)
         {
             do
             {
@@ -198,22 +229,23 @@ void UIService::editMedia(Media *media, bool isBrowse)
 
                 std::string episodeInput;
 
-                std::cin >> episodeInput;
+                std::getline(std::cin, episodeInput);
+
 
                 std::istringstream stream(episodeInput);
 
                 int progress;
                 if (stream >> progress)
                 {
-                    if (progress > media->getEpisodes())
+                    if (progress > media.getEpisodes())
                     {
-                        progress = media->getEpisodes();
+                        progress = media.getEpisodes();
                     }
                     else if (progress < 0)
                     {
                         progress = 0;
                     }
-                    media->setWatchedEpisodes(progress);
+                    media.setWatchedEpisodes(progress);
                     break;
                 }
                 else
@@ -225,11 +257,10 @@ void UIService::editMedia(Media *media, bool isBrowse)
         }
         else if (input == "a" && isBrowse)
         {
-            std::vector<Media *> myListMedia = MediaBuild::readMediaJSON(false);
             bool found = false;
             for (const auto *myListMedium: myListMedia)
             {
-                if (myListMedium->getId() == media->getId())
+                if (myListMedium->getId() == media.getId())
                 {
                     found = true;
                     break;
@@ -237,7 +268,9 @@ void UIService::editMedia(Media *media, bool isBrowse)
             }
             if (!found)
             {
-                myListMedia.push_back(media);
+                media.setWatchedEpisodes(0);
+                media.setAverageScore(0);
+                myListMedia.push_back(&media);
             }
             else
             {
@@ -263,4 +296,24 @@ std::string UIService::getTitle(Title *title)
         return title->getRomaji();
     }
     return title->getEnglish();
+}
+
+const std::vector<Media *> &UIService::getBrowseMedia() const
+{
+    return browseMedia;
+}
+
+void UIService::setBrowseMedia(const std::vector<Media *> &browseMedia)
+{
+    UIService::browseMedia = browseMedia;
+}
+
+const std::vector<Media *> &UIService::getMyListMedia() const
+{
+    return myListMedia;
+}
+
+void UIService::setMyListMedia(const std::vector<Media *> &myListMedia)
+{
+    UIService::myListMedia = myListMedia;
 }

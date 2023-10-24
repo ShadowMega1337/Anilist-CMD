@@ -23,6 +23,8 @@ public:
     static Media* getAnimeWithId(const std::vector<Media *>& media, int id);
 
     static Media* getAnimeWithName(const std::vector<Media *>& media, const std::string& name);
+
+    static void resetScore(const std::vector<Media *> &media);
 };
 
 
