@@ -1,0 +1,84 @@
+[
+	{
+		"adult" : false,
+		"averageScore" : 0,
+		"countryOfOrigin" : "JP",
+		"duration" : 24,
+		"endDate" : 
+		{
+			"day" : 0,
+			"month" : 0,
+			"year" : 0
+		},
+		"episodes" : 1079,
+		"format" : "TV",
+		"genres" : 
+		[
+			"Action",
+			"Adventure",
+			"Comedy",
+			"Drama",
+			"Fantasy"
+		],
+		"id" : 21,
+		"popularity" : 466358,
+		"season" : "FALL",
+		"seasonYear" : 1999,
+		"source" : "MANGA",
+		"startDate" : 
+		{
+			"day" : 20,
+			"month" : 10,
+			"year" : 1999
+		},
+		"status" : "RELEASING",
+		"title" : 
+		{
+			"english" : "ONE PIECE",
+			"romaji" : "ONE PIECE"
+		},
+		"type" : "ANIME",
+		"watchedEpisodes" : 500
+	},
+	{
+		"adult" : false,
+		"averageScore" : 0,
+		"countryOfOrigin" : "JP",
+		"duration" : 25,
+		"endDate" : 
+		{
+			"day" : 8,
+			"month" : 9,
+			"year" : 1998
+		},
+		"episodes" : 94,
+		"format" : "TV",
+		"genres" : 
+		[
+			"Action",
+			"Adventure",
+			"Comedy",
+			"Drama",
+			"Romance"
+		],
+		"id" : 45,
+		"popularity" : 66611,
+		"season" : "WINTER",
+		"seasonYear" : 1996,
+		"source" : "MANGA",
+		"startDate" : 
+		{
+			"day" : 10,
+			"month" : 1,
+			"year" : 1996
+		},
+		"status" : "FINISHED",
+		"title" : 
+		{
+			"english" : "Rurouni Kenshin",
+			"romaji" : "Rurouni Kenshin: Meiji Kenkaku Romantan"
+		},
+		"type" : "ANIME",
+		"watchedEpisodes" : 0
+	}
+]

@@ -19,23 +19,17 @@
 #include "MediaStatus.h"
 #include "MediaSource.h"
 #include "MediaSort.h"
+#include "EnumMapping.h"
 
 class MediaBuild
 {
 public:
-    std::vector<Media*> readMediaJSON();
+    static std::vector<Media*> readMediaJSON(bool isBrowseTab);
+
+    static void writeListToFile(const std::vector<Media *> &mediaList);
 
 private:
-    static MediaSeason mapToMediaSeason(const std::string &seasonStr);
-
-    static MediaType mapToMediaType(const std::string &typeStr);
-
-    static MediaFormat mapToMediaFormat(const std::string &formatStr);
-
-    static MediaStatus mapToMediaStatus(const std::string &statusStr);
-
-    static MediaSource mapToMediaSource(const std::string &sourceStr);
-
+    static std::vector<std::string> getGenres(const Json::Value& genres);
 };
 
 #endif //M323_LB3_MEDIABUILD_H
