@@ -73,17 +73,12 @@ short Backend::getAverageScore(const std::vector<Media *> &media)
 
 unsigned int Backend::getTotalEpisodes(const std::vector<Media *> &media)
 {
-    unsigned int totalEpisodes = 0;
-
-    for (Media *mediaItem: media)
-    {
-        if (mediaItem != nullptr)
-        {
-            totalEpisodes += mediaItem->getEpisodes();
+    return std::accumulate(media.begin(), media.end(), 0, [](unsigned int sum, Media* mediaItem) {
+        if (mediaItem != nullptr) {
+            return sum + static_cast<unsigned int>(mediaItem->getWatchedEpisodes());
         }
-    }
-
-    return totalEpisodes;
+        return sum;
+    });
 }
 
 Media *Backend::getAnimeWithId(const std::vector<Media *> &media, int id)
