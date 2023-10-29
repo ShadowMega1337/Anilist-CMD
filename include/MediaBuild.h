@@ -5,6 +5,7 @@
 #ifndef M323_LB3_MEDIABUILD_H
 #define M323_LB3_MEDIABUILD_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <iostream>

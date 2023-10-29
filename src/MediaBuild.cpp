@@ -31,9 +31,9 @@ std::vector<Media *> MediaBuild::readMediaJSON(bool isBrowseTab)
 
     // Create a vector to store Media objects
     std::vector<Media *> mediaArray;
-    for (const Json::Value &mediaJson: root)
-    {
-        auto *media = new Media(
+
+    std::transform(root.begin(), root.end(), std::back_inserter(mediaArray), [](const Json::Value &mediaJson) {
+        auto newMedia = new Media(
                 mediaJson["id"].asInt(),
                 new Title(mediaJson["title"]["english"].asString(), mediaJson["title"]["romaji"].asString()),
                 new Date(mediaJson["startDate"]["day"].asInt(), mediaJson["startDate"]["month"].asInt(),
@@ -56,10 +56,11 @@ std::vector<Media *> MediaBuild::readMediaJSON(bool isBrowseTab)
         );
         if (mediaJson["watchedEpisodes"])
         {
-            media->setWatchedEpisodes(mediaJson["watchedEpisodes"].asInt());
+            newMedia->setWatchedEpisodes(mediaJson["watchedEpisodes"].asInt());
         }
-        mediaArray.push_back(media);
-    }
+        return newMedia;
+    });
+
     jsonFile.close();
     return mediaArray;
 }
@@ -68,7 +69,7 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
 {
     Json::Value jsonArray;
 
-    for (const auto &media: mediaList)
+    std::for_each(mediaList.begin(), mediaList.end(), [&jsonArray](const Media *media)
     {
         Json::Value myList;
 
@@ -114,10 +115,13 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
 
         Json::Value genres;
         const auto &mediaGenres = media->getGenres();
-        for (const auto &genre: mediaGenres)
-        {
-            genres.append(genre);
-        }
+
+        std::for_each(mediaGenres.begin(), mediaGenres.end(),
+                      [&genres](const std::string &genre)
+                      {
+                          genres.append(genre);
+                      }
+        );
 
         myList["genres"] = genres;
         myList["averageScore"] = media->getAverageScore();
@@ -126,7 +130,7 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
         myList["countryOfOrigin"] = media->getCountryOfOrigin();
 
         jsonArray.append(myList);
-    }
+    });
     // Write the JSON to a file
     std::ofstream outFile("../resources/myList.json");
     if (outFile.is_open())
@@ -143,10 +147,13 @@ void MediaBuild::writeListToFile(const std::vector<Media *> &mediaList)
 
 std::vector<std::string> MediaBuild::getGenres(const Json::Value &jsonGenres)
 {
-    std::vector<std::string> genres;
-    for (const auto &genre: jsonGenres)
-    {
-        genres.push_back(genre.asString());
-    }
+    std::vector<std::string> genres(jsonGenres.size());
+
+    std::transform(jsonGenres.begin(), jsonGenres.end(), genres.begin(),
+                   [](const Json::Value &genre)
+                   {
+                       return genre.asString();
+                   }
+    );
     return genres;
 }

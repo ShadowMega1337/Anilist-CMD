@@ -42,7 +42,8 @@ Media::Media(
           averageScore(averageScore),
           popularity(popularity),
           source(source),
-          countryOfOrigin(countryOfOrigin)
+          countryOfOrigin(countryOfOrigin),
+          watchedEpisodes(0)
 {
 }
 
@@ -231,9 +232,11 @@ void Media::printAttributes()
 {
     std::cout << "Id: " << id << std::endl;
     std::cout << "Title (english): " << title->getEnglish() << std::endl;
-    std::cout << "Title (romaji): " << title->getRomaji()<< std::endl;
-    std::cout << "StartDate: " << startDate->getYear() << "-" << startDate->getMonth() << "-" << startDate->getDay() << std::endl;
-    std::cout << "EndDate: " << endDate->getYear() << "-" << endDate->getMonth() << "-" << endDate->getDay() << std::endl;
+    std::cout << "Title (romaji): " << title->getRomaji() << std::endl;
+    std::cout << "StartDate: " << startDate->getYear() << "-" << startDate->getMonth() << "-" << startDate->getDay()
+              << std::endl;
+    std::cout << "EndDate: " << endDate->getYear() << "-" << endDate->getMonth() << "-" << endDate->getDay()
+              << std::endl;
     std::cout << "Season: " << EnumMapping::mediaSeasonToString(season) << std::endl;
     std::cout << "SeasonYear: " << seasonYear << std::endl;
     std::cout << "Type: " << EnumMapping::mediaTypeToString(type) << std::endl;
@@ -244,9 +247,13 @@ void Media::printAttributes()
     std::cout << "CountryOfOrigin: " << countryOfOrigin << std::endl;
     std::cout << "Adult: " << adult << std::endl;
     std::cout << "Genres: ";
-    for (const auto &genre: genres)
+    std::for_each(genres.begin(), genres.end(), [](const std::string &genre)
     {
-        std::cout << genre << " ";
+        std::cout << genre << ", ";
+    });
+    if (!genres.empty())
+    {
+        std::cout << "\b\b ";  // Remove the last two characters (", ")
     }
     std::cout << std::endl;
     std::cout << "AverageScore: " << averageScore << std::endl;
