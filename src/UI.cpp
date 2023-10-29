@@ -23,28 +23,7 @@ void UI::drawList(std::vector<Media *> mediaList, int page, bool isBrowse)
             printf("|%-6s|%-149s|%-10s|%-10s|%-20s|\n", "Id", "Title", "Score", "Progress", "Status");
         }
     }
-    for (int i = page * 50; i < page * 50 + 50 && i < mediaList.size(); ++i)
-    {
-        auto media = mediaList[i];
-        std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
-        if (isBrowse)
-        {
-
-            printf("|%-6d|%-149s|%10d|%10d|%20s|\n",
-                   media->getId(), UIService::getTitle(media->getTitle()).c_str(),
-                   media->getAverageScore(),
-                   media->getEpisodes(),
-                   EnumMapping::mediaStatusToString(media->getStatus()).c_str());
-        }
-        else
-        {
-            printf("|%-6d|%-149s|%10d|%10d|%20s|\n",
-                   media->getId(), UIService::getTitle(media->getTitle()).c_str(),
-                   media->getAverageScore(),
-                   media->getWatchedEpisodes(),
-                   getWatchedStatus(media->getEpisodes(), media->getWatchedEpisodes()).c_str());
-        }
-    }
+    drawFields(page * 50, page * 50, mediaList, isBrowse);
     std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
     std::cout << "Page " << page + 1 << " out of " << mediaList.size() / 50 + 1 << std::endl;
 
@@ -91,5 +70,31 @@ std::string UI::getWatchedStatus(int episodes, int watchedEpisodes)
     else
     {
         return "WATCHING";
+    }
+}
+
+void UI::drawFields(int startListAnime, int index, std::vector<Media *> mediaList, bool isBrowse)
+{
+    auto media = mediaList[index];
+    std::cout << "+" << std::setfill('-') << std::setw(200) << "+" << std::endl;
+    if (isBrowse)
+    {
+        printf("|%-6d|%-149s|%10d|%10d|%20s|\n",
+               media->getId(), UIService::getTitle(media->getTitle()).c_str(),
+               media->getAverageScore(),
+               media->getEpisodes(),
+               EnumMapping::mediaStatusToString(media->getStatus()).c_str());
+    }
+    else
+    {
+        printf("|%-6d|%-149s|%10d|%10d|%20s|\n",
+               media->getId(), UIService::getTitle(media->getTitle()).c_str(),
+               media->getAverageScore(),
+               media->getWatchedEpisodes(),
+               getWatchedStatus(media->getEpisodes(), media->getWatchedEpisodes()).c_str());
+    }
+    if (index < startListAnime + 50 && index + 1 < mediaList.size())
+    {
+        drawFields(startListAnime, index + 1, mediaList, isBrowse);
     }
 }

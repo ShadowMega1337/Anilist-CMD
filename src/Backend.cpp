@@ -3,6 +3,10 @@
 //
 
 #include "Backend.h"
+#include <algorithm>
+#include <functional>
+#include <numeric>
+#include <cctype>
 
 std::string trim(const std::string &str)
 {
@@ -15,123 +19,111 @@ std::string trim(const std::string &str)
     return str.substr(first, (last - first + 1));
 }
 
+bool isMatch(const std::string& titleEn, const std::string& titleJp, const std::string& filter) {
+    std::string lowerFilter = filter;
+    std::transform(lowerFilter.begin(), lowerFilter.end(), lowerFilter.begin(), ::tolower);
+
+    std::string lowerTitleEn = titleEn;
+    std::transform(lowerTitleEn.begin(), lowerTitleEn.end(), lowerTitleEn.begin(), ::tolower);
+
+    std::string lowerTitleJp = titleJp;
+    std::transform(lowerTitleJp.begin(), lowerTitleJp.end(), lowerTitleJp.begin(), ::tolower);
+
+    return (lowerTitleEn.find(lowerFilter) != std::string::npos || lowerTitleJp.find(lowerFilter) != std::string::npos);
+}
+
 std::vector<Media *> Backend::getFilteredList(std::vector<Media *> media, const std::string &filter)
 {
     std::vector<Media *> filteredList;
-        for (Media* mediaItem : media) {
+
+    std::copy_if(media.begin(), media.end(), std::back_inserter(filteredList), [&](Media* mediaItem) {
+        if (mediaItem != nullptr && mediaItem->getTitle() != nullptr) {
             std::string titleEn = mediaItem->getTitle()->getEnglish();
             std::string titleJp = mediaItem->getTitle()->getRomaji();
-            for (char &c: titleEn)
-            {
-                c = std::tolower(c);
-            }
-            for (char &c: titleJp)
-            {
-                c = std::tolower(c);
-            }
-            if (mediaItem != nullptr && mediaItem->getTitle() != nullptr) {
-                if (titleEn.find(filter) != std::string::npos ||
-                    titleJp.find(filter) != std::string::npos) {
-                    filteredList.push_back(mediaItem);
-                }
-            }
+            return isMatch(titleEn, titleJp, filter);
         }
-        return filteredList;
+        return false;
+    });
 
+    return filteredList;
 }
 
-short Backend::getAverageScore(const std::vector<Media *> &media)
+int Backend::getAverageScore(const std::vector<Media *> &media)
 {
-    double totalScore = 0.0;
-    int max = 0;
-
-    for (Media *mediaItem: media)
-    {
-        if (mediaItem->getWatchedEpisodes() != 0)
-        {
-            if (mediaItem != nullptr)
-            {
-                int score = mediaItem->getAverageScore();
-                if (score >= 0)
-                {
-                    totalScore += static_cast<double>(score);
-                    max++;
-                }
+    int totalScore = std::accumulate(media.begin(), media.end(), 0, [](int sum, Media* mediaItem) {
+        if (mediaItem != nullptr && mediaItem->getWatchedEpisodes() != 0) {
+            int score = mediaItem->getAverageScore();
+            if (score >= 0) {
+                return sum + score;
             }
         }
-    }
+        return sum;
+    });
 
-    if (max > 0)
-    {
-        return totalScore / static_cast<double>(max);
-    }
-    else
-    {
-        return 0.0;
+    int max = std::count_if(media.begin(), media.end(), [](Media* mediaItem) {
+        return (mediaItem != nullptr && mediaItem->getWatchedEpisodes() != 0 && mediaItem->getAverageScore() >= 0);
+    });
+
+    if (max > 0) {
+        return totalScore / max;
+    } else {
+        return 0;
     }
 }
 
-unsigned int Backend::getTotalEpisodes(const std::vector<Media *> &media)
+int Backend::getTotalEpisodes(const std::vector<Media *> &media)
 {
-    unsigned int totalEpisodes = 0;
-
-    for (Media *mediaItem: media)
-    {
-        if (mediaItem != nullptr)
-        {
-            totalEpisodes += mediaItem->getEpisodes();
+    return std::accumulate(media.begin(), media.end(), 0, [](int sum, Media* mediaItem) {
+        if (mediaItem != nullptr) {
+            return sum + mediaItem->getWatchedEpisodes();
         }
-    }
-
-    return totalEpisodes;
+        return sum;
+    });
 }
 
 Media *Backend::getAnimeWithId(const std::vector<Media *> &media, int id)
 {
-    for (Media *mediaItem: media)
-    {
-        if (mediaItem != nullptr && mediaItem->getId() == id)
-        {
-            return mediaItem;
-        }
+    auto it = std::find_if(media.begin(), media.end(), [id](Media* mediaItem) {
+        return (mediaItem != nullptr && mediaItem->getId() == id);
+    });
+
+    if (it != media.end()) {
+        return *it;
     }
+
     return nullptr;
 }
 
 Media *Backend::getAnimeWithName(const std::vector<Media *> &media, const std::string &name)
 {
-    for (Media *mediaItem: media)
-    {
-        std::string titleEn = mediaItem->getTitle()->getEnglish();
-        std::string titleJp = mediaItem->getTitle()->getRomaji();
-        for (char &c: titleEn)
-        {
-            c = std::tolower(c);
-        }
-        for (char &c: titleJp)
-        {
-            c = std::tolower(c);
-        }
+    auto it = std::find_if(media.begin(), media.end(), [&](Media* mediaItem) {
+        if (mediaItem != nullptr && mediaItem->getTitle() != nullptr) {
+            std::string titleEn = mediaItem->getTitle()->getEnglish();
+            std::string titleJp = mediaItem->getTitle()->getRomaji();
 
-        if (mediaItem->getTitle())
-        {
-            if ((titleEn == trim(name) && !titleEn.empty()) || (titleJp == trim(name) && !titleJp.empty()))
-            {
-                return mediaItem;
-            }
+            std::transform(titleEn.begin(), titleEn.end(), titleEn.begin(), ::tolower);
+            std::transform(titleJp.begin(), titleJp.end(), titleJp.begin(), ::tolower);
 
+            return ((titleEn == trim(name) && !titleEn.empty()) || (titleJp == trim(name) && !titleJp.empty()));
         }
+        return false;
+    });
 
+    if (it != media.end()) {
+        return *it;
     }
+
     return nullptr;
 }
 
 void Backend::resetScore(const std::vector<Media *> &media)
 {
-    for (const auto &medium: media)
-    {
+    std::vector<Media*> updatedMedia;
+
+    std::transform(media.begin(), media.end(), std::back_inserter(updatedMedia), [](Media* medium) {
         if (medium != nullptr) {
             medium->setAverageScore(0);
         }
-    }
+        return medium;
+    });
 }

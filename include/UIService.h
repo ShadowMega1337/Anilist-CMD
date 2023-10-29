@@ -9,6 +9,7 @@
 #include <fstream>
 #include <limits>
 #include <jsoncpp/json/json.h>
+#include <algorithm>
 
 #include "UI.h"
 #include "Backend.h"
@@ -16,27 +17,26 @@
 
 class UIService
 {
-private:
-    std::vector<Media*> browseMedia;
-    std::vector<Media*> myListMedia;
 public:
-    short menu();
+    short menu(short previousResult);
 
-    void list(bool isBrowse);
+    void list(bool isBrowse, std::vector<Media*> browseMedia, std::vector<Media*> &myListMedia);
+
+    void listRecursive(bool isBrowse, int page, std::vector<Media *> &media, std::vector<Media *> &filteredMedia, std::vector<Media*> &myListMedia);
 
     static void stats(const std::vector<Media *>& media);
 
-    void editMedia(Media &media, bool isBrowse);
+    void editMedia(Media &media, bool isBrowse, std::vector<Media*> &myListMedia);
 
     static std::string getTitle(Title* title);
 
-    const std::vector<Media *> &getBrowseMedia() const;
+    void selectAnime(std::string input, bool isBrowse, std::vector<Media*> media, std::vector<Media*> &myListMedia);
 
-    void setBrowseMedia(const std::vector<Media *> &browseMedia);
+    int goToPage(const std::vector<Media*>& media);
 
-    const std::vector<Media *> &getMyListMedia() const;
+    void inputRating(Media &media);
 
-    void setMyListMedia(const std::vector<Media *> &myListMedia);
+    void updateProgress(Media &media);
 };
 
 
