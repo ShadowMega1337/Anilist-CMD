@@ -21,6 +21,7 @@ public:
     static void drawList(std::vector<Media *> mediaList, int show, bool isBrowse);
     static void drawMenu();
     static void drawStats(const std::vector<Media *>& mediaList);
+    static void drawFields(int startListAnime, int index, std::vector<Media *> mediaList, bool isBrowse);
 
     static std::string getWatchedStatus(int episodes, int episodes1);
 };

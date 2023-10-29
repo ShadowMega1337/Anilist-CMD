@@ -8,28 +8,23 @@ int main()
     std::vector<Media *> media = MediaBuild::readMediaJSON(true);
     std::vector<Media *> myListMedia = MediaBuild::readMediaJSON(false);
 
-    UIService* service = new UIService;
-    service->setBrowseMedia(media);
-    service->setMyListMedia(myListMedia);
+    auto *service = new UIService;
 
-    std::string input;
-    short window = 0; // 0: Menu, 1: List, 2: Stats
-
-    do
+    std::function<void(short)> mainLoop = [&](short window)
     {
-        if (window == 1)
+        if (window != 0)
         {
-            service->list(true);
+            if (window == 1 || window == 2)
+            {
+                service->list(window == 1, media, myListMedia);
+            }
+            mainLoop(service->menu(0));
         }
-        else if (window == 2)
-        {
-            service->list(false);
-        }
-        window = service->menu();
-    }
-    while (window != 0);
+    };
 
-    MediaBuild::writeListToFile(service->getMyListMedia());
+    mainLoop(-1);
+
+    MediaBuild::writeListToFile(myListMedia);
 
     delete service;
 

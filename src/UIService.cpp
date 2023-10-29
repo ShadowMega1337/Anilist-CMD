@@ -5,144 +5,87 @@
 #include "UIService.h"
 
 
-short UIService::menu()
+short UIService::menu(short previousResult)
 {
+    UI::drawMenu();
     std::string input;
+    std::getline(std::cin, input);
+    std::istringstream stream(input);
     short number = 0;
 
-    do
+    if (stream >> number && (number < 3 && number >= 0))
     {
-        UI::drawMenu();
-        std::getline(std::cin, input);
-        std::istringstream stream(input);
-        if (stream >> number && (number < 3 && number >= 0))
-        {
-            return number;
-        }
-        else
-        {
-            std::cout << "Not an valid Input, try again." << std::endl;
-        }
-
+        return number;
     }
-    while (true);
+    else
+    {
+        std::cout << "Not an valid Input, try again." << std::endl;
+        return menu(previousResult); // Recursive call
+    }
 }
 
-void UIService::list(bool isBrowse)
+void UIService::list(bool isBrowse, std::vector<Media *> browseMedia, std::vector<Media *> &myListMedia)
 {
     std::vector<Media *> &media = isBrowse ? browseMedia : myListMedia;
     std::vector<Media *> filteredMedia = media;
-    int page = 0;
+
+    listRecursive(isBrowse, 0, media, filteredMedia, myListMedia);
+}
+
+void UIService::listRecursive(bool isBrowse, int page, std::vector<Media *> &media, std::vector<Media *> &filteredMedia,
+                              std::vector<Media *> &myListMedia)
+{
+    UI::drawList(filteredMedia, page, isBrowse);
+
     std::string input;
-    do
+    std::getline(std::cin, input);
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+
+    if (input == "n")
     {
-        UI::drawList(filteredMedia, page, isBrowse);
+        listRecursive(isBrowse, page + 1, media, filteredMedia, myListMedia);
+    }
+    else if (input == "f")
+    {
+        std::cout << "Input search string" << std::endl;
+        std::string filter;
+        std::getline(std::cin, filter);
 
-        std::getline(std::cin, input);
+        std::transform(filter.begin(), filter.end(), filter.begin(), ::tolower);
 
-        for (char &c: input)
+        filteredMedia = Backend::getFilteredList(media, filter);
+        listRecursive(isBrowse, 0, media, filteredMedia, myListMedia);
+    }
+    else if (input == "s")
+    {
+        std::cout << "Input id or the EXACT name to select an anime" << std::endl;
+        std::string selectInput;
+
+        selectAnime(selectInput, isBrowse, media, myListMedia);
+        listRecursive(isBrowse, page, media, filteredMedia, myListMedia);
+    }
+    else if (input == "p")
+    {
+        std::cout << "Input page number?" << std::endl;
+        page = goToPage(media);
+        listRecursive(isBrowse, page, media, filteredMedia, myListMedia);
+    }
+    else if (input == "0")
+    {
+        // Terminate the recursion
+    }
+    else
+    {
+        if (input == "1")
         {
-            c = std::tolower(c);
-        }
-
-        if (input == "n")
-        {
-            page += 1;
-        }
-        else if (input == "f")
-        {
-            std::cout << "Input search string" << std::endl;
-            std::string filter;
-            std::getline(std::cin, filter);
-
-            for (char &c: filter)
-            {
-                c = std::tolower(c);
-            }
-
-            filteredMedia = Backend::getFilteredList(media, filter);
-        }
-        else if (input == "s")
-        {
-            std::cout << "Input id or the EXACT name to select an anime" << std::endl;
-            std::string selectInput;
-            do
-            {
-                std::getline(std::cin, selectInput);
-
-                for (char &c: selectInput)
-                {
-                    c = std::tolower(c);
-                }
-
-                Media *selectedMedia;
-
-                std::istringstream stream(selectInput);
-
-                int id;
-                if (stream >> id)
-                {
-                    selectedMedia = Backend::getAnimeWithId(media, id);
-                }
-                else
-                {
-                    selectedMedia = Backend::getAnimeWithName(media, selectInput);
-                }
-                if (selectedMedia)
-                {
-                    selectedMedia->printAttributes();
-
-                    editMedia(*selectedMedia, isBrowse);
-                    break;
-                }
-                else
-                {
-                    std::cout << "Not found" << std::endl;
-                }
-            }
-            while (true);
-        }
-        else if (input == "p")
-        {
-            std::cout << "Input page number?" << std::endl;
-
-            bool running = true;
-            do
-            {
-                std::string pageInput;
-                std::getline(std::cin, pageInput);
-                std::istringstream stream(pageInput);
-
-                int checkPageInput;
-                if (stream >> checkPageInput && (checkPageInput <= media.size() / 50 + 1 && checkPageInput > 0))
-                {
-                    page = checkPageInput - 1;
-                    running = false;
-                }
-                else
-                {
-                    std::cout << "Not an valid Input, try again." << std::endl;
-                }
-            }
-            while (running);
-        }
-        else if (input == "0")
-        {
-            break;
+            stats(media);
         }
         else
         {
-            if (input == "1")
-            {
-                UIService::stats(media);
-            }
-            else
-            {
-                std::cout << "Not an valid Input, try again." << std::endl;
-            }
+            std::cout << "Not a valid input, try again." << std::endl;
         }
+        listRecursive(isBrowse, page, media, filteredMedia, myListMedia);
     }
-    while (true);
 }
 
 void UIService::stats(const std::vector<Media *> &media)
@@ -152,141 +95,74 @@ void UIService::stats(const std::vector<Media *> &media)
     std::string input;
     std::getline(std::cin, input);
 
-    for (char &c: input)
-    {
-        c = std::tolower(c);
-    }
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+
     if (input == "r")
     {
         Backend::resetScore(media);
     }
 }
 
-void UIService::editMedia(Media &media, bool isBrowse)
+void UIService::editMedia(Media &media, bool isBrowse, std::vector<Media *> &myListMedia)
 {
     std::string input;
-    do
+    if (isBrowse)
     {
-        if (isBrowse)
+        std::cout << "\nPress A, to add to your list" << std::endl;
+    }
+    else
+    {
+        std::cout << "\nPress R, to edit your rating" << "\n"
+                  << "Press P, to edit your progress" << std::endl;
+
+    }
+    std::cout << "Press 0, to go back" << std::endl;
+
+    std::getline(std::cin, input);
+
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+
+    if (input == "r" && !isBrowse)
+    {
+        inputRating(media);
+        editMedia(media, isBrowse, myListMedia);
+    }
+    else if (input == "p" && !isBrowse)
+    {
+        updateProgress(media);
+
+        editMedia(media, isBrowse, myListMedia);
+    }
+    else if (input == "a" && isBrowse)
+    {
+        if (
+                !std::any_of(myListMedia.begin(), myListMedia.end(),
+                             [media](const Media *myListMedium)
+                             {
+                                 return myListMedium->getId() == media.getId();
+                             }
+                ))
         {
-            std::cout << "\nPress A, to add to your list" << std::endl;
+            media.setWatchedEpisodes(0);
+            media.setAverageScore(0);
+            myListMedia.push_back(&media);
+            editMedia(media, isBrowse, myListMedia);
         }
         else
         {
-            std::cout << "\nPress R, to edit your rating" << "\n"
-                      << "Press P, to edit your progress" << std::endl;
-
-        }
-        std::cout << "Press 0, to go back" << std::endl;
-
-        std::getline(std::cin, input);
-
-        for (char &c: input)
-        {
-            c = std::tolower(c);
-        }
-
-        if (input == "r" && !isBrowse)
-        {
-            do
-            {
-                std::cout << "Input your rating" << std::endl;
-
-                std::string ratingInput;
-
-                std::getline(std::cin, ratingInput);
-
-
-                std::istringstream stream(ratingInput);
-
-                int rating;
-                if (stream >> rating)
-                {
-                    std::cout << rating;
-                    if (rating > 100)
-                    {
-                        rating = 100;
-                    }
-                    else if (rating < 0)
-                    {
-                        rating = 0;
-                    }
-                    media.setAverageScore(rating);
-                    break;
-                }
-                else
-                {
-                    std::cout << "Not an valid Input, try again." << std::endl;
-                }
-            }
-            while (true);
-        }
-        else if (input == "p" && !isBrowse)
-        {
-            do
-            {
-                std::cout << "Input watched episodes" << std::endl;
-
-                std::string episodeInput;
-
-                std::getline(std::cin, episodeInput);
-
-
-                std::istringstream stream(episodeInput);
-
-                int progress;
-                if (stream >> progress)
-                {
-                    if (progress > media.getEpisodes())
-                    {
-                        progress = media.getEpisodes();
-                    }
-                    else if (progress < 0)
-                    {
-                        progress = 0;
-                    }
-                    media.setWatchedEpisodes(progress);
-                    break;
-                }
-                else
-                {
-                    std::cout << "Not an valid Input, try again." << std::endl;
-                }
-            }
-            while (true);
-        }
-        else if (input == "a" && isBrowse)
-        {
-            bool found = false;
-            for (const auto *myListMedium: myListMedia)
-            {
-                if (myListMedium->getId() == media.getId())
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                media.setWatchedEpisodes(0);
-                media.setAverageScore(0);
-                myListMedia.push_back(&media);
-            }
-            else
-            {
-                std::cout << "Already in your list" << std::endl;
-            }
-        }
-        else if (input == "0")
-        {
-            break;
-        }
-        else
-        {
-            std::cout << "Not an valid Input, try again." << std::endl;
+            std::cout << "Already in your list" << std::endl;
+            editMedia(media, isBrowse, myListMedia);
         }
     }
-    while (true);
+    else if (input == "0")
+    {
+        // Terminate recursion
+    }
+    else
+    {
+        std::cout << "Not an valid Input, try again." << std::endl;
+        editMedia(media, isBrowse, myListMedia);
+    }
 }
 
 std::string UIService::getTitle(Title *title)
@@ -298,22 +174,116 @@ std::string UIService::getTitle(Title *title)
     return title->getEnglish();
 }
 
-const std::vector<Media *> &UIService::getBrowseMedia() const
+void
+UIService::selectAnime(std::string input, bool isBrowse, std::vector<Media *> media, std::vector<Media *> &myListMedia)
 {
-    return browseMedia;
+    std::getline(std::cin, input);
+
+    std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+
+    Media *selectedMedia;
+
+    std::istringstream stream(input);
+    int id;
+
+    if (stream >> id)
+    {
+        selectedMedia = Backend::getAnimeWithId(media, id);
+    }
+    else
+    {
+        selectedMedia = Backend::getAnimeWithName(media, input);
+    }
+
+    if (selectedMedia)
+    {
+        selectedMedia->printAttributes();
+        editMedia(*selectedMedia, isBrowse, myListMedia);
+    }
+    else
+    {
+        std::cout << "Not found" << std::endl;
+        selectAnime(input, isBrowse, media, myListMedia);
+    }
 }
 
-void UIService::setBrowseMedia(const std::vector<Media *> &browseMedia)
+int UIService::goToPage(const std::vector<Media *> &media)
 {
-    UIService::browseMedia = browseMedia;
+    std::string pageInput;
+    std::getline(std::cin, pageInput);
+    std::istringstream stream(pageInput);
+    int checkPageInput;
+
+    if (stream >> checkPageInput && (checkPageInput <= media.size() / 50 + 1 && checkPageInput > 0))
+    {
+        return checkPageInput - 1;
+    }
+    else
+    {
+        std::cout << "Not a valid input, try again." << std::endl;
+        return goToPage(media);
+    }
 }
 
-const std::vector<Media *> &UIService::getMyListMedia() const
+void UIService::inputRating(Media &media)
 {
-    return myListMedia;
+    std::cout << "Input your rating" << std::endl;
+
+    std::string ratingInput;
+
+    std::getline(std::cin, ratingInput);
+
+
+    std::istringstream stream(ratingInput);
+
+    int rating;
+    if (stream >> rating)
+    {
+        std::cout << rating;
+        if (rating > 100)
+        {
+            rating = 100;
+        }
+        else if (rating < 0)
+        {
+            rating = 0;
+        }
+        media.setAverageScore(rating);
+    }
+    else
+    {
+        std::cout << "Not an valid Input, try again." << std::endl;
+        inputRating(media);
+    }
 }
 
-void UIService::setMyListMedia(const std::vector<Media *> &myListMedia)
+void UIService::updateProgress(Media &media)
 {
-    UIService::myListMedia = myListMedia;
+    std::cout << "Input watched episodes" << std::endl;
+
+    std::string episodeInput;
+
+    std::getline(std::cin, episodeInput);
+
+
+    std::istringstream stream(episodeInput);
+
+    int progress;
+    if (stream >> progress)
+    {
+        if (progress > media.getEpisodes())
+        {
+            progress = media.getEpisodes();
+        }
+        else if (progress < 0)
+        {
+            progress = 0;
+        }
+        media.setWatchedEpisodes(progress);
+    }
+    else
+    {
+        std::cout << "Not an valid Input, try again." << std::endl;
+        updateProgress(media);
+    }
 }
